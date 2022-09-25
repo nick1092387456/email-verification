@@ -30,7 +30,6 @@ function checkInputs() {
   else setErrorFor(email, '格式不正確')
 
   //驗證姓名
-  console.log(username.validity.patternMismatch)
   if (username.validity.typeMismatch) setErrorFor(username, "請輸入'中文'姓名")
   else if (username.validity.valueMissing)
     setErrorFor(username, '名稱欄位不可為空白')

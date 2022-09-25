@@ -4,13 +4,19 @@
   <div class='card my-3' style='width:500px; height:500px'>
     <div class='card-body'>
       <h4 class='card-title'>網址註冊</h4>
-      <form class='row g-3 needs-validation' novalidate>
-        <div class='col-md-12'>
+      <form
+        class='row g-3 needs-validation'
+        novalidate
+        action='/send'
+        method='post'
+      >
+        <div class='form-group col-md-12'>
           <label for='email' class='form-label'>您的電子郵件</label>
           <input
             type='email'
             class='form-control'
             id='email'
+            name='email'
             size='32'
             autocomplete='off'
             minlength='3'
@@ -22,28 +28,30 @@
           />
           <div class='invalid-feedback'>error message</div>
         </div>
-        <div class='col-md-12'>
+        <div class='form-group col-md-12'>
           <label for='username' class='form-label'>承辦人</label>
           <input
             type='text'
             class='form-control'
             id='username'
+            name='username'
             autocomplete='off'
             maxlength='50'
             minlength='2'
-            placeholder='您你姓名'
+            placeholder='您的姓名'
             pattern='([\u4E00-\u9FFF])*([A-Za-z])*'
             oninput='changeCheck(this)'
             required
           />
           <div class='invalid-feedback'>error message</div>
         </div>
-        <div class='col-md-12'>
+        <div class='form-group col-md-12'>
           <label for='url' class='form-label'>欲轉換長網址</label>
           <input
             type='url'
             class='form-control'
             id='url'
+            name='url'
             autocomplete='off'
             maxlength='2048'
             minlength='18'
