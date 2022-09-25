@@ -8,6 +8,7 @@ app.engine('hbs', engine({ extname: '.hbs' }))
 app.set('view engine', 'hbs')
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'))
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'))
+app.use('/tools', express.static(__dirname + '/tools'))
 app.use(routes)
 app.listen(port, () => {
   console.info(`Example app listening on port ${port}!`)
