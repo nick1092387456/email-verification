@@ -1,92 +1,223 @@
-const email = document.getElementById('email')
-const longURL = document.getElementById('url')
-const agency = document.getElementById('agency')
-const checkBtn = document.getElementById('checkBtn')
+const urlCheckBtn = document.getElementById('checkBtn')
+const submitButton = document.getElementById('submitButton')
 
-;(() => {
+;(function validate_submit() {
   'use strict'
   const forms = document.querySelectorAll('.needs-validation')
   Array.from(forms).forEach((form) => {
     form.addEventListener(
       'submit',
-      (event) => {
-        if (!form.checkValidity()) {
+      async (event) => {
+        if (checkSubmit() === false) {
           event.preventDefault()
           event.stopPropagation()
         }
-        checkInputs()
-        form.classList.add('was-validated')
       },
       false
     )
   })
 })()
+;(function validate_url() {
+  const urlElement = document.getElementById('url')
+  urlElement.addEventListener('input', (e) => {
+    if (checkURL(urlElement) === false) {
+      urlElement.classList.add('is-invalid')
+      urlElement.classList.remove('is-valid')
+      urlCheckBtn.disabled = true
+    } else {
+      urlCheckBtn.disabled = false
+      setErrorFor(urlElement, '請點擊右側檢測')
+    }
+  })
+})()
+;(function validate_agency() {
+  const agencyElement = document.getElementById('agency')
+  agencyElement.addEventListener('input', (e) => {
+    if (checkAgency(agencyElement) === false) {
+      agencyElement.classList.add('is-invalid')
+      agencyElement.classList.remove('is-valid')
+    } else {
+      agencyElement.classList.remove('is-invalid')
+      agencyElement.classList.add('is-valid')
+    }
+  })
+})()
+;(function validate_email() {
+  const emailElement = document.getElementById('email')
+  emailElement.addEventListener('input', (e) => {
+    if (checkEmail(emailElement) === false) {
+      emailElement.classList.add('is-invalid')
+      emailElement.classList.remove('is-valid')
+    } else {
+      emailElement.classList.remove('is-invalid')
+      emailElement.classList.add('is-valid')
+    }
+  })
+})()
 
-function checkInputs() {
-  //驗證Email
-  if (email.validity.typeMismatch) setErrorFor(email, '信箱格式不正確')
-  else if (email.validity.patternMismatch)
-    setErrorFor(email, '只接受政府單位信箱的人員註冊')
-  else if (email.validity.valueMissing) setErrorFor(email, '信箱欄位不可為空白')
-  else setErrorFor(email, '格式不正確')
+function checkSubmit() {
+  const urlElement = document.getElementById('url')
+  const emailElement = document.getElementById('email')
+  const agencyElement = document.getElementById('agency')
+  let result = true
+  //驗證網址
+  if (checkURL(urlElement) === false) {
+    urlElement.classList.add('is-invalid')
+    urlElement.classList.remove('is-valid')
+    result = false
+  } else {
+    urlElement.classList.remove('is-invalid')
+    urlElement.classList.add('is-valid')
+  }
 
   //驗證單位
-  if (agency.validity.typeMismatch)
-    setErrorFor(agency, "請輸入'中文或英文'名稱")
-  else if (agency.validity.valueMissing)
-    setErrorFor(agency, '單位欄位不可為空白')
-  else if (agency.validity.tooLong) setErrorFor(agency, '名稱過長')
-  else if (agency.validity.tooShort) setErrorFor(agency, '名稱過短')
-  else setErrorFor(agency, '格式不正確')
+  if (checkAgency(agencyElement) === false) {
+    agencyElement.classList.add('is-invalid')
+    agencyElement.classList.remove('is-valid')
+    result = false
+  } else {
+    agencyElement.classList.remove('is-invalid')
+    agencyElement.classList.add('is-valid')
+  }
 
-  //驗證網址
-  if (longURL.validity.typeMismatch) {
-    setErrorFor(longURL, '網址格式不正確')
-  } else if (longURL.validity.patternMismatch) {
-    setErrorFor(longURL, "僅接受'gov.tw'的網域做轉址")
-  } else if (longURL.validity.valueMissing) {
-    setErrorFor(longURL, '長網址欄位不可為空白')
-  } else setErrorFor(longURL, '格式不正確')
+  //驗證Email
+  if (checkEmail(emailElement) === false) {
+    emailElement.classList.add('is-invalid')
+    emailElement.classList.remove('is-valid')
+    result = false
+  } else {
+    emailElement.classList.remove('is-invalid')
+    emailElement.classList.add('is-valid')
+  }
+  return result
 }
 
-function setErrorFor(input, message) {
-  const formControl = input.parentElement
+function checkURL(urlElement) {
+  let result = false
+  const url = urlElement.value
+  const re = /http(s)?:\/\/(?:[^.]+\.){0,}?gov\.tw(\/.*)?/
+  const URLRule =
+    /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&=]*)/
+  if (!url) {
+    setErrorFor(urlElement, '長網址欄位不可為空白')
+    return result
+  }
+  if (!URLRule.test(url)) {
+    setErrorFor(urlElement, '網址格式不正確')
+    return result
+  }
+  if (!re.test(url)) {
+    setErrorFor(urlElement, "僅接受'gov.tw'的網域做轉址")
+    return result
+  }
+  if (url.length <= 14) {
+    setErrorFor(urlElement, '網址太短')
+    return result
+  }
+  if (url.length >= 2048) {
+    setErrorFor(urlElement, '網址過長')
+    return result
+  }
+  urlElement.value = url.replace(/^http:\/\//i, 'https://')
+  result = true
+  return result
+}
+
+function checkAgency(agencyElement) {
+  let result = false
+  const re = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/
+  const agency = agencyElement.value
+  if (!agency) {
+    setErrorFor(agencyElement, '單位欄位不可為空白')
+    return result
+  }
+  if (!re.test(agency)) {
+    setErrorFor(agencyElement, "請輸入'中文或英文'名稱")
+    return result
+  }
+  if (agency.length <= 2) {
+    setErrorFor(agencyElement, '名稱最少三個字')
+    return result
+  }
+  if (agency.length >= 50) {
+    setErrorFor(agencyElement, '名稱不能超過50字')
+    return result
+  }
+  result = true
+  return result
+}
+
+function checkEmail(emailElement) {
+  let result = false
+  const email = emailElement.value
+  const re = /.+@(?:[^.]+\.){0,}?gov\.tw/
+  const emailRule =
+    /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/
+  if (!email) {
+    setErrorFor(emailElement, '信箱欄位不可為空白')
+    return result
+  }
+  if (!emailRule.test(email)) {
+    setErrorFor(emailElement, '信箱格式不正確')
+    return result
+  }
+  if (!re.test(email)) {
+    setErrorFor(emailElement, '只接受政府單位信箱的人員註冊')
+    return result
+  }
+  if (email.length <= 8) {
+    setErrorFor(emailElement, '信箱過短')
+    return result
+  }
+  if (email.length >= 64) {
+    setErrorFor(emailElement, '信箱過長')
+    return result
+  }
+  result = true
+  return result
+}
+
+function setErrorFor(selectedElement, message) {
+  const formControl = selectedElement.parentElement
   const messageBox = formControl.querySelector('.invalid-feedback')
   messageBox.innerText = message
 }
 
-function changeCheck(e) {
-  checkInputs()
-  if (e.checkValidity()) {
-    e.classList.remove('is-invalid')
-    e.classList.add('is-valid')
-    return true
-  } else {
-    e.classList.add('is-invalid')
-    e.classList.remove('is-valid')
-    return false
-  }
-}
-
-;(async function fetchAndQueryCheck() {
+;(async function validateURLClick() {
   try {
-    checkBtn.addEventListener('click', async (e) => {
-      e.preventDefault
-      // fetchCheck()
-      const shortURL = await queryCheck()
-      console.log(shortURL)
+    const urlCheckResultModal = new bootstrap.Modal(
+      document.getElementById('urlCheckResultModal'),
+      {}
+    )
+    urlCheckBtn.addEventListener('click', async (e) => {
+      const urlElement = document.getElementById('url')
+      const shortURL = await checkURLExist(urlElement)
+      if (shortURL) {
+        e.preventDefault
+        setModalInput(shortURL)
+        setErrorFor(urlElement, '此網址已經註冊')
+        urlElement.classList.add('is-invalid')
+        urlElement.classList.remove('is-valid')
+        urlCheckResultModal.show()
+      } else {
+        urlElement.classList.remove('is-invalid')
+        urlElement.classList.add('is-valid')
+        urlElement.disabled = true
+      }
     })
   } catch (err) {
     console.log(err)
   }
 })()
 
-async function fetchCheck() {
+function checkURLState() {}
+
+async function checkURLStatus(urlElement) {
   try {
-    const url = longURL.value
-    if (!urlRegexCheck(url)) {
-      alert('網址格式錯誤')
-      throw new Error('網址格式錯誤')
+    const url = urlElement.value
+    if (checkURL(urlElement) === false) {
+      urlCheckBtn.disabled = true
+      return
     }
     const response = await fetch(url)
     if (response.status !== 200) {
@@ -98,34 +229,27 @@ async function fetchCheck() {
   }
 }
 
-function urlRegexCheck(url) {
-  let result = true
-  const re = /http(s)?:\/\/(?:[^.]+\.){0,}?gov\.tw(\/.*)?/
-  const URLRule =
-    /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&=]*)/
-  if (!url) result = false
-  else if (!URLRule.test(url)) result = false
-  else if (!re.test(url)) result = false
-  else if (url.length <= 8 || url.length >= 64) result = false
-  return result
-}
-
-async function queryCheck() {
+async function checkURLExist(urlElement) {
   try {
     const myHost = window.location.origin
     const getShort = myHost + '/getShort'
     const response = await fetch(getShort, {
       method: 'POST',
-      body: JSON.stringify({ data: longURL.value }),
+      body: JSON.stringify({ data: urlElement.value }),
       headers: { 'Content-Type': 'application/json' },
     })
-    if (response) {
+    if (response.ok) {
       const data = await response.json()
       const shortURL = myHost + '/' + data.link
       return shortURL
     }
+    return false
   } catch (err) {
     console.log(err)
   }
 }
 
+function setModalInput(content) {
+  const modalBody = document.getElementById('shortIsExistModalContent')
+  modalBody.innerHTML = `<p>${content}</p>`
+}

@@ -6,9 +6,9 @@ const urlListController = {
   getShortURL: async (req, res) => {
     try {
       const url = req.body.data
-      console.log('------------------------' + url)
       const data = await urlList.findOne({ where: { originURL: url } })
       if (data) res.json({ link: data.shortURL })
+      return res.status(400).json({ message: 'no record' })
     } catch (err) {
       console.log(err)
     }

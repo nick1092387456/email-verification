@@ -25,14 +25,10 @@
               id='url'
               name='url'
               autocomplete='off'
-              maxlength='2048'
-              minlength='18'
               placeholder='https://example.gov.tw'
-              pattern='http(s)?:\/\/(?:[^.]+\.){0,}?gov\.tw(\/.*)?'
-              oninput='changeCheck(this)'
               required
             />
-            <button id="checkBtn" class='btn btn-primary'>檢查</button>
+            <button id='checkBtn' class='btn btn-primary' disabled>檢查</button>
             <div class='invalid-feedback'>error message</div>
 
           </div>
@@ -46,11 +42,7 @@
             id='agency'
             name='agency'
             autocomplete='off'
-            maxlength='50'
-            minlength='2'
             placeholder='長網址所屬單位'
-            pattern='([\u4E00-\u9FFF])*([A-Za-z])*'
-            oninput='changeCheck(this)'
             required
           />
           <div class='invalid-feedback'>error message</div>
@@ -63,23 +55,48 @@
             class='form-control'
             id='email'
             name='email'
-            size='32'
             autocomplete='off'
-            minlength='3'
-            maxlength='64'
             placeholder='abc@example.gov.tw'
-            pattern='.+@(?:[^.]+\.){0,}?gov\.tw'
-            oninput='changeCheck(this)'
             required
           />
           <div class='invalid-feedback'>error message</div>
         </div>
         <div class='col-12 d-flex justify-content-end'>
-          <button class='btn btn-primary' type='submit'>註冊</button>
+          <button
+            class='btn btn-primary'
+            id='submitButton'
+            type='submit'
+          >註冊</button>
         </div>
         <h3>{{message}}</h3>
       </form>
     </div>
   </div>
 
+</div>
+
+<div class='modal' tabindex='-1' id='urlCheckResultModal'>
+  <div class='modal-dialog'>
+    <div class='modal-content'>
+      <div class='modal-header'>
+        <h5 class='modal-title'>此網址已申請過</h5>
+        <button
+          type='button'
+          class='btn-close'
+          data-bs-dismiss='modal'
+          aria-label='Close'
+        ></button>
+      </div>
+      <div class='modal-body' id='shortIsExistModalContent'>
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class='modal-footer'>
+        <button
+          type='button'
+          class='btn btn-secondary'
+          data-bs-dismiss='modal'
+        >Close</button>
+      </div>
+    </div>
+  </div>
 </div>

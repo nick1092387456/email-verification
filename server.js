@@ -2,11 +2,11 @@ const express = require('express')
 const app = express()
 require('dotenv').config()
 const { engine } = require('express-handlebars')
-import urlExist from 'url-exist'
+// import urlExist from 'url-exist'
 
-;(async () => {
-  const result = await urlExist('https://google.com')
-})()
+// ;(async () => {
+//   const result = await urlExist('https://google.com')
+// })()
 
 const port = process.env.PORT || 3000
 

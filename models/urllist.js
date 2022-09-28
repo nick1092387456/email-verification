@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       agency: DataTypes.STRING,
       email: DataTypes.STRING,
       isValid: DataTypes.BOOLEAN,
+      urlState: DataTypes.STRING,
     },
     {
       sequelize,
