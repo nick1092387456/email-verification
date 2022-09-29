@@ -5,6 +5,7 @@ let checkStatus = false
 ;(function validate_submit() {
   'use strict'
   const forms = document.querySelectorAll('.needs-validation')
+  const urlElement = document.getElementById('url')
   Array.from(forms).forEach((form) => {
     form.addEventListener(
       'submit',
@@ -12,6 +13,12 @@ let checkStatus = false
         if (checkSubmit() === false) {
           event.preventDefault()
           event.stopPropagation()
+          const checkURLStateResult = await checkURLState(urlElement)
+          if (checkURLStateResult) {
+            urlElement.classList.add('is-invalid')
+            urlElement.classList.remove('is-valid')
+            setErrorFor(urlElement, '此網址已經註冊')
+          }
         }
       },
       false
@@ -45,6 +52,34 @@ let checkStatus = false
     }
   })
 })()
+;(async function validateURLClick() {
+  try {
+    const urlCheckResultModal = new bootstrap.Modal(
+      document.getElementById('urlCheckResultModal'),
+      {}
+    )
+    urlCheckBtn.addEventListener('click', async (e) => {
+      const urlElement = document.getElementById('url')
+      const shortURL = await checkURLState(urlElement)
+      if (shortURL) {
+        e.preventDefault
+        setModalInput(shortURL)
+        setErrorFor(urlElement, '此網址已經註冊')
+        urlElement.classList.add('is-invalid')
+        urlElement.classList.remove('is-valid')
+        urlCheckResultModal.show()
+      } else {
+        urlElement.classList.remove('is-invalid')
+        urlElement.classList.add('is-valid')
+        urlElement.readOnly = true
+        urlCheckBtn.disabled = true
+        checkStatus = true
+      }
+    })
+  } catch (err) {
+    console.log(err)
+  }
+})()
 
 function checkSubmit() {
   const urlElement = document.getElementById('url')
@@ -75,7 +110,6 @@ function checkSubmit() {
   if (checkStatus === false) result = false
   return result
 }
-
 function checkURL(urlElement) {
   let result = false
   const url = urlElement.value
@@ -106,7 +140,6 @@ function checkURL(urlElement) {
   result = true
   return result
 }
-
 function checkEmail(emailElement) {
   let result = false
   const email = emailElement.value
@@ -136,41 +169,11 @@ function checkEmail(emailElement) {
   result = true
   return result
 }
-
 function setErrorFor(selectedElement, message) {
   const formControl = selectedElement.parentElement
   const messageBox = formControl.querySelector('.invalid-feedback')
   messageBox.innerText = message
 }
-
-;(async function validateURLClick() {
-  try {
-    const urlCheckResultModal = new bootstrap.Modal(
-      document.getElementById('urlCheckResultModal'),
-      {}
-    )
-    urlCheckBtn.addEventListener('click', async (e) => {
-      const urlElement = document.getElementById('url')
-      const shortURL = await checkURLState(urlElement)
-      if (shortURL) {
-        e.preventDefault
-        setModalInput(shortURL)
-        setErrorFor(urlElement, '此網址已經註冊')
-        urlElement.classList.add('is-invalid')
-        urlElement.classList.remove('is-valid')
-        urlCheckResultModal.show()
-      } else {
-        urlElement.classList.remove('is-invalid')
-        urlElement.classList.add('is-valid')
-        urlElement.readOnly = true
-        urlCheckBtn.disabled = true
-        checkStatus = true
-      }
-    })
-  } catch (err) {
-    console.log(err)
-  }
-})()
 
 async function checkURLStatus(urlElement) {
   try {
@@ -188,7 +191,6 @@ async function checkURLStatus(urlElement) {
     console.log(err)
   }
 }
-
 async function checkURLState(urlElement) {
   try {
     const myHost = window.location.origin
