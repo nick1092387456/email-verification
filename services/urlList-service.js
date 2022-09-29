@@ -6,7 +6,7 @@ const urlListServices = {
     try {
       const url = req.body.data
       const data = await urlList.findOne({ where: { originURL: url } })
-      if (data && data.urlState === 'isValid') {
+      if (!!data && data.urlState === 'isValid') {
         res.status(400).json({ data: { link: data.shortURL } })
       } else {
         res.status(200).json({ data: { message: '未註冊' } })

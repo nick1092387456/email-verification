@@ -29,7 +29,10 @@ router.post('/send', async (req, res) => {
   try {
     const { url, email } = req.body
     const checkFormResult = await checkForm(email, url)
-    if (!checkFormResult) res.render('home', { message: '表單錯誤請重新填寫' })
+    if (!checkFormResult) {
+      res.render('home', { message: '表單錯誤請重新填寫' })
+      return
+    }
     const verifyCode = uuidv4()
     const link = 'https://' + host + '/verify?id=' + verifyCode
     mailOptions = {
