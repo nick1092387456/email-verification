@@ -14,6 +14,7 @@
     "bootstrap": "^5.2.1",
     "bootstrap-icons": "^1.9.1",
     "cors": "^2.8.5",
+    "curl": "^0.1.4",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "express-handlebars": "^6.0.6",

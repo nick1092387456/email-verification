@@ -28,7 +28,6 @@ router.post('/checkState', urlListController.checkState)
 router.post('/send', async (req, res) => {
   try {
     const { url, agency, email } = req.body
-    console.log('我是多少我是多少我是多少???' + JSON.stringify(req.body))
     const checkFormResult = await checkForm(agency, email, url)
     if (!checkFormResult) res.render('home', { message: '表單錯誤請重新填寫' })
     const verifyCode = uuidv4()
@@ -39,14 +38,27 @@ router.post('/send', async (req, res) => {
       html: `<p>請點擊連結完成認證 ${link} </p>`,
     }
     const shortURL = await genShort()
-    await urlList.create({
-      shortURL,
-      originURL: url,
-      agency,
-      email,
-      urlState: 'certificating',
-      verifyCode: verifyCode,
-    })
+    const data = await urlList.findOne({ where: { originURL: url } })
+    if (!data) {
+      await urlList.create({
+        shortURL,
+        originURL: url,
+        agency,
+        email,
+        urlState: 'certificating',
+        verifyCode: verifyCode,
+      })
+    } else {
+      await data.update({
+        ...data,
+        shortURL,
+        originURL: url,
+        agency,
+        email,
+        urlState: 'certificating',
+        verifyCode: verifyCode,
+      })
+    }
 
     smtpTransport.sendMail(mailOptions, function (error, response) {
       if (error) {
@@ -54,7 +66,7 @@ router.post('/send', async (req, res) => {
         res.end('error')
       } else {
         console.log('Message send: ' + response.message)
-        res.render('home', { message: '確認信件已寄出，請檢察您的信箱' })
+        res.render('home', { message: '確認信件已寄出，請檢查您的信箱' })
       }
     })
   } catch (err) {
