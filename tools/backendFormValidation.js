@@ -1,23 +1,12 @@
 const db = require('../models')
 const { urlList } = db
 
-async function checkForm(agency, email, url) {
+async function checkForm(email, url) {
   //失敗 return false
   const checkURLStateResult = await checkURLState(url)
-  return !checkAgency(agency) ||
-    !checkEmail(email) ||
-    !checkURL(url) ||
-    !checkURLStateResult
+  return !checkEmail(email) || !checkURL(url) || !checkURLStateResult
     ? false
     : true
-}
-
-function checkAgency(agency) {
-  let result = true
-  const re = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/
-  if (!agency || !re.test(agency) || agency.length <= 2 || agency.length >= 50)
-    result = false
-  return result
 }
 
 function checkEmail(email) {
@@ -59,7 +48,6 @@ async function checkURLState(url) {
 }
 
 module.exports = {
-  checkAgency,
   checkEmail,
   checkURL,
   checkForm,

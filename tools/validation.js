@@ -33,18 +33,6 @@ let checkStatus = false
     }
   })
 })()
-;(function validate_agency() {
-  const agencyElement = document.getElementById('agency')
-  agencyElement.addEventListener('input', (e) => {
-    if (checkAgency(agencyElement) === false) {
-      agencyElement.classList.add('is-invalid')
-      agencyElement.classList.remove('is-valid')
-    } else {
-      agencyElement.classList.remove('is-invalid')
-      agencyElement.classList.add('is-valid')
-    }
-  })
-})()
 ;(function validate_email() {
   const emailElement = document.getElementById('email')
   emailElement.addEventListener('input', (e) => {
@@ -61,7 +49,6 @@ let checkStatus = false
 function checkSubmit() {
   const urlElement = document.getElementById('url')
   const emailElement = document.getElementById('email')
-  const agencyElement = document.getElementById('agency')
   let result = true
   //驗證網址
   if (checkURL(urlElement) === false) {
@@ -71,16 +58,6 @@ function checkSubmit() {
   } else {
     urlElement.classList.remove('is-invalid')
     urlElement.classList.add('is-valid')
-  }
-
-  //驗證單位
-  if (checkAgency(agencyElement) === false) {
-    agencyElement.classList.add('is-invalid')
-    agencyElement.classList.remove('is-valid')
-    result = false
-  } else {
-    agencyElement.classList.remove('is-invalid')
-    agencyElement.classList.add('is-valid')
   }
 
   //驗證Email
@@ -126,30 +103,6 @@ function checkURL(urlElement) {
     return result
   }
   urlElement.value = url.replace(/^http:\/\//i, 'https://')
-  result = true
-  return result
-}
-
-function checkAgency(agencyElement) {
-  let result = false
-  const re = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/
-  const agency = agencyElement.value
-  if (!agency) {
-    setErrorFor(agencyElement, '單位欄位不可為空白')
-    return result
-  }
-  if (!re.test(agency)) {
-    setErrorFor(agencyElement, "請輸入'中文或英文'名稱")
-    return result
-  }
-  if (agency.length <= 2) {
-    setErrorFor(agencyElement, '名稱最少三個字')
-    return result
-  }
-  if (agency.length >= 50) {
-    setErrorFor(agencyElement, '名稱不能超過50字')
-    return result
-  }
   result = true
   return result
 }

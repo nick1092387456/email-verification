@@ -15,9 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       shortURL: DataTypes.STRING,
       originURL: DataTypes.STRING,
-      agency: DataTypes.STRING,
       email: DataTypes.STRING,
-      isValid: DataTypes.BOOLEAN,
       urlState: DataTypes.STRING,
       verifyCode: DataTypes.STRING,
     },

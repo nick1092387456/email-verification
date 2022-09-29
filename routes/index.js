@@ -27,8 +27,8 @@ router.post('/checkState', urlListController.checkState)
 
 router.post('/send', async (req, res) => {
   try {
-    const { url, agency, email } = req.body
-    const checkFormResult = await checkForm(agency, email, url)
+    const { url, email } = req.body
+    const checkFormResult = await checkForm(email, url)
     if (!checkFormResult) res.render('home', { message: '表單錯誤請重新填寫' })
     const verifyCode = uuidv4()
     const link = 'https://' + host + '/verify?id=' + verifyCode
@@ -43,7 +43,6 @@ router.post('/send', async (req, res) => {
       await urlList.create({
         shortURL,
         originURL: url,
-        agency,
         email,
         urlState: 'certificating',
         verifyCode: verifyCode,
@@ -53,7 +52,6 @@ router.post('/send', async (req, res) => {
         ...data,
         shortURL,
         originURL: url,
-        agency,
         email,
         urlState: 'certificating',
         verifyCode: verifyCode,
