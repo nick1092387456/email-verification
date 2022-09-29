@@ -25,6 +25,7 @@
     "popper.js": "^1.16.1",
     "sequelize": "^6.23.1",
     "sequelize-cli": "^6.4.1",
-    "url-exist": "^3.0.1"
+    "url-exist": "^3.0.1",
+    "uuid": "^9.0.0"
   }
 }

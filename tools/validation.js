@@ -1,5 +1,6 @@
 const urlCheckBtn = document.getElementById('checkBtn')
 const submitButton = document.getElementById('submitButton')
+let checkStatus = false
 
 ;(function validate_submit() {
   'use strict'
@@ -20,6 +21,8 @@ const submitButton = document.getElementById('submitButton')
 ;(function validate_url() {
   const urlElement = document.getElementById('url')
   urlElement.addEventListener('input', (e) => {
+    checkStatus = false
+
     if (checkURL(urlElement) === false) {
       urlElement.classList.add('is-invalid')
       urlElement.classList.remove('is-valid')
@@ -89,6 +92,10 @@ function checkSubmit() {
     emailElement.classList.remove('is-invalid')
     emailElement.classList.add('is-valid')
   }
+
+  //驗證檢測按鈕是否檢測
+
+  if (checkStatus === false) result = false
   return result
 }
 
@@ -191,7 +198,7 @@ function setErrorFor(selectedElement, message) {
     )
     urlCheckBtn.addEventListener('click', async (e) => {
       const urlElement = document.getElementById('url')
-      const shortURL = await checkURLExist(urlElement)
+      const shortURL = await checkURLState(urlElement)
       if (shortURL) {
         e.preventDefault
         setModalInput(shortURL)
@@ -202,15 +209,15 @@ function setErrorFor(selectedElement, message) {
       } else {
         urlElement.classList.remove('is-invalid')
         urlElement.classList.add('is-valid')
-        urlElement.disabled = true
+        urlElement.readOnly = true
+        urlCheckBtn.disabled = true
+        checkStatus = true
       }
     })
   } catch (err) {
     console.log(err)
   }
 })()
-
-function checkURLState() {}
 
 async function checkURLStatus(urlElement) {
   try {
@@ -229,17 +236,17 @@ async function checkURLStatus(urlElement) {
   }
 }
 
-async function checkURLExist(urlElement) {
+async function checkURLState(urlElement) {
   try {
     const myHost = window.location.origin
-    const getShort = myHost + '/getShort'
-    const response = await fetch(getShort, {
+    const checkState = myHost + '/checkState'
+    const response = await fetch(checkState, {
       method: 'POST',
       body: JSON.stringify({ data: urlElement.value }),
       headers: { 'Content-Type': 'application/json' },
     })
-    if (response.ok) {
-      const data = await response.json()
+    if (!response.ok) {
+      const { data } = await response.json()
       const shortURL = myHost + '/' + data.link
       return shortURL
     }

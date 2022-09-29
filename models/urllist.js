@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       isValid: DataTypes.BOOLEAN,
       urlState: DataTypes.STRING,
+      verifyCode: DataTypes.STRING,
     },
     {
       sequelize,

@@ -1,20 +1,15 @@
 const express = require('express')
 const router = express.Router()
 const nodemailer = require('nodemailer')
-const {
-  checkOriginURLExist,
-  checkShortURLExist,
-} = require('../tools/checkURLExist')
+const { v4: uuidv4 } = require('uuid')
 const { genShort } = require('../tools/shortenURL')
-const { signUpURL } = require('../controllers/urlList-controller')
+const { checkForm } = require('../tools/backendFormValidation')
 const urlListController = require('../controllers/urlList-controller')
+const db = require('../models')
+const { urlList } = db
 
-
-const rand = Math.floor(Math.random() * 100 + 54)
 const host = 'localhost:3000'
 let mailOptions = null
-let load = {}
-let originURL = ''
 
 const smtpTransport = nodemailer.createTransport({
   service: 'gmail',
@@ -28,30 +23,43 @@ router.get('/home', (req, res) => {
   res.render('home')
 })
 
-router.post('/send', (req, res) => {
-  const userEmail = req.body.email
-  load = req.body
-  originURL = req.body.url
-  const link = 'https://' + host + '/verify?id=' + rand
-  mailOptions = {
-    // to: userEmail,
-    to: 'nick1092387456@gmail.com',
-    subject: 'Please confirm your Email account',
-    html:
-      'Hello, Please Click on the link to verify your email.' +
-      link +
-      '>Click here to verify',
-  }
+router.post('/checkState', urlListController.checkState)
 
-  smtpTransport.sendMail(mailOptions, function (error, response) {
-    if (error) {
-      console.log(error)
-      res.end('error')
-    } else {
-      console.log('Message send: ' + response.message)
-      res.render('home', { message: '確認信件已寄出，請檢察您的信箱' })
+router.post('/send', async (req, res) => {
+  try {
+    const { url, agency, email } = req.body
+    console.log('我是多少我是多少我是多少???' + JSON.stringify(req.body))
+    const checkFormResult = await checkForm(agency, email, url)
+    if (!checkFormResult) res.render('home', { message: '表單錯誤請重新填寫' })
+    const verifyCode = uuidv4()
+    const link = 'https://' + host + '/verify?id=' + verifyCode
+    mailOptions = {
+      to: 'nick1092387456@gmail.com',
+      subject: 'Please confirm your Email account',
+      html: `<p>請點擊連結完成認證 ${link} </p>`,
     }
-  })
+    const shortURL = await genShort()
+    await urlList.create({
+      shortURL,
+      originURL: url,
+      agency,
+      email,
+      urlState: 'certificating',
+      verifyCode: verifyCode,
+    })
+
+    smtpTransport.sendMail(mailOptions, function (error, response) {
+      if (error) {
+        console.log(error)
+        res.end('error')
+      } else {
+        console.log('Message send: ' + response.message)
+        res.render('home', { message: '確認信件已寄出，請檢察您的信箱' })
+      }
+    })
+  } catch (err) {
+    console.log(err)
+  }
 })
 
 router.get('/verify', async (req, res) => {
@@ -59,27 +67,28 @@ router.get('/verify', async (req, res) => {
     console.log(req.protocol + ':/' + req.get('host'))
     if (req.protocol + '://' + req.get('host') == 'http://' + host) {
       console.log('Domain is matched. Information is from Authentic email')
-      if (req.query.id == rand) {
+      const verifyCode = req.query.id
+      const data = await urlList.findOne({ where: { verifyCode } })
+      if (data) {
         console.log('email is verified')
-        const short = await genShort()
-        const shortURL = 'https://gov.tw/' + short
-        await signUpURL(load, short)
+        await data.update({
+          ...data,
+          urlState: 'isValid',
+        })
+        const shortURL = 'https://gov.tw/' + data.shortURL
+        const originURL = data.originURL
         res.render('result', { originURL, shortURL })
       } else {
         console.log('email is not verified')
         res.end('<h1>Bad Request</h1>')
       }
     } else {
-      res.end('<h1>Request is from unknown source')
+      res.end('<h1>Request is from unknown source</h1>')
     }
   } catch (err) {
     console.log(err)
   }
 })
-
-router.post('/getShort', urlListController.getShortURL)
-
-router.post('/urlIsExist', (req, res) => {})
 
 router.get('/', (req, res) => {
   res.redirect('/home')
